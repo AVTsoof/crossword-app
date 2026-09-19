@@ -1,59 +1,99 @@
----
-layout: default
-title: מחולל תשבצים ותשחצים
----
-<link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מחולל תשבצים ותשחצים</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="crossword-container arrowword-mode" dir="rtl">
+    <header class="app-header no-print">
+      <div class="header-titles">
+        <h1 class="app-title">מחולל תשבצים ותשחצים</h1>
+        <p id="mode-subtitle" class="mode-subtitle">תשחץ ישראלי • הגדרות וחצים בתוך משבצות הלוח</p>
+      </div>
+    </header>
 
-<div class="crossword-container arrowword-mode" dir="rtl">
-  <header class="controls-bar no-print">
-    <div class="mode-toggle-group">
-      <span class="mode-toggle-label">מצב:</span>
-      <label class="toggle-option">
-        <input type="radio" name="puzzle-mode" value="arrowword" checked>
-        <span>תשחץ (Arrowword)</span>
-      </label>
-      <label class="toggle-option">
-        <input type="radio" name="puzzle-mode" value="standard">
-        <span>תשבץ רגיל</span>
-      </label>
-    </div>
-
-    <button id="btn-generate" class="btn">צור תשחץ חדש</button>
-    <button id="btn-print" class="btn btn-secondary">הדפס / שמור כ-PDF</button>
-    <button id="btn-check" class="btn btn-outline">בדוק תשובות</button>
-    <button id="btn-toggle-solution" class="btn btn-outline">הסתר פתרון</button>
-
-    <div class="filter-group">
-      <label for="category-filter">קטגוריה:</label>
-      <select id="category-filter">
-        <option value="">כל הקטגוריות</option>
-      </select>
-    </div>
-  </header>
-
-  <main>
-    <div class="puzzle-layout">
-      <div class="grid-wrapper">
-        <div id="puzzle-grid" class="crossword-grid"></div>
+    <div class="controls-bar no-print">
+      <div class="mode-toggle-group" role="radiogroup" aria-label="בחירת סוג תשבץ">
+        <span class="mode-toggle-label">סוג משחק:</span>
+        <label class="toggle-option" id="opt-arrowword">
+          <input type="radio" name="puzzle-mode" value="arrowword" checked>
+          <span class="toggle-label-content">
+            <strong>תשחץ</strong>
+            <small>(Arrowword)</small>
+          </span>
+        </label>
+        <label class="toggle-option" id="opt-standard">
+          <input type="radio" name="puzzle-mode" value="standard">
+          <span class="toggle-label-content">
+            <strong>תשבץ רגיל</strong>
+            <small>(Standard)</small>
+          </span>
+        </label>
       </div>
 
-      <div id="clues-container" class="clues-wrapper">
-        <h3>מאוזן</h3>
-        <ul id="clues-across" class="clues-list"></ul>
+      <div class="action-buttons-group">
+        <button id="btn-generate" class="btn btn-primary">
+          <span class="btn-icon">↻</span>
+          <span id="btn-generate-text">צור תשחץ חדש</span>
+        </button>
+        <button id="btn-check" class="btn btn-action">
+          <span class="btn-icon">✓</span>
+          <span>בדוק תשובות</span>
+        </button>
+        <button id="btn-toggle-solution" class="btn btn-outline">
+          <span class="btn-icon">👁</span>
+          <span id="btn-solution-text">הצג פתרון</span>
+        </button>
+        <button id="btn-print" class="btn btn-secondary">
+          <span class="btn-icon">🖨</span>
+          <span>הדפס / שמור כ-PDF</span>
+        </button>
+      </div>
 
-        <h3>מאונך</h3>
-        <ul id="clues-down" class="clues-list"></ul>
+      <div class="filter-group">
+        <label for="category-filter">נושא:</label>
+        <select id="category-filter">
+          <option value="">כל הקטגוריות</option>
+        </select>
       </div>
     </div>
 
-    <section id="solution-view" class="solution-section">
-      <h2 id="solution-title">פתרון התשחץ</h2>
-      <div class="grid-wrapper">
-        <div id="solution-grid" class="crossword-grid"></div>
-      </div>
-    </section>
-  </main>
-</div>
+    <div id="status-message" class="status-banner hidden"></div>
 
-<script src="generator.js"></script>
-<script src="app.js"></script>
+    <main class="main-content">
+      <div class="puzzle-layout">
+        <div class="grid-wrapper">
+          <div id="puzzle-grid" class="crossword-grid"></div>
+        </div>
+
+        <div id="clues-container" class="clues-wrapper hidden">
+          <div class="clues-column">
+            <h3>מאוזן</h3>
+            <ul id="clues-across" class="clues-list"></ul>
+          </div>
+          <div class="clues-column">
+            <h3>מאונך</h3>
+            <ul id="clues-down" class="clues-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <section id="solution-view" class="solution-section hidden">
+        <div class="solution-header">
+          <h2 id="solution-title">פתרון התשחץ</h2>
+          <span class="solution-badge">פתרון מלא</span>
+        </div>
+        <div class="grid-wrapper">
+          <div id="solution-grid" class="crossword-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="generator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

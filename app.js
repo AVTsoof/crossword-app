@@ -17,7 +17,7 @@ async function init() {
     const gridEl = document.getElementById('puzzle-grid');
     if (gridEl) {
       gridEl.innerHTML =
-        '<p style="color:red; padding:20px;">שגיאה בטעינת מאגר המילים (words.json). ודא שהקובץ קיים ותקין.</p>';
+        '<p style=\"color:#b91c1c; padding:20px; font-weight:bold;\">שגיאה בטעינת מאגר המילים (words.json). ודא שהקובץ קיים ותקין.</p>';
     }
   }
 }
@@ -52,15 +52,10 @@ function setupEventListeners() {
 }
 
 function setMode(mode) {
+  if (currentMode === mode && currentPuzzle) return;
   currentMode = mode;
   updateModeUI();
-  if (currentPuzzle) {
-    renderPuzzle();
-    renderClues();
-    renderSolution();
-  } else {
-    buildNewPuzzle();
-  }
+  buildNewPuzzle();
 }
 
 function updateModeUI() {
@@ -75,36 +70,82 @@ function updateModeUI() {
     }
   }
 
-  const btnGen = document.getElementById('btn-generate');
-  if (btnGen) {
-    btnGen.textContent = currentMode === 'arrowword' ? 'צור תשחץ חדש' : 'צור תשבץ חדש';
+  // Update subtitle
+  const subtitle = document.getElementById('mode-subtitle');
+  if (subtitle) {
+    subtitle.textContent = currentMode === 'arrowword'
+      ? 'תשחץ ישראלי • הגדרות וחצים בתוך משבצות הלוח'
+      : 'תשבץ קלאסי • משבצות ממוספרות עם רשימת הגדרות בצד';
   }
 
+  // Update button labels
+  const btnGenText = document.getElementById('btn-generate-text');
+  if (btnGenText) {
+    btnGenText.textContent = currentMode === 'arrowword' ? 'צור תשחץ חדש' : 'צור תשבץ חדש';
+  }
+
+  // Update solution title
   const solTitle = document.getElementById('solution-title');
   if (solTitle) {
     solTitle.textContent = currentMode === 'arrowword' ? 'פתרון התשחץ' : 'פתרון התשבץ';
   }
 
+  // Update clues container visibility
+  const cluesContainer = document.getElementById('clues-container');
+  if (cluesContainer) {
+    if (currentMode === 'arrowword') {
+      cluesContainer.classList.add('hidden');
+    } else {
+      cluesContainer.classList.remove('hidden');
+    }
+  }
+
+  // Ensure radio checked state
   const radio = document.querySelector(`input[name="puzzle-mode"][value="${currentMode}"]`);
   if (radio) radio.checked = true;
+
+  // Clear status banner
+  setStatus('', '');
+}
+
+function setStatus(text, type = 'info') {
+  const banner = document.getElementById('status-message');
+  if (!banner) return;
+  if (!text) {
+    banner.className = 'status-banner hidden';
+    banner.textContent = '';
+  } else {
+    banner.className = `status-banner ${type}`;
+    banner.textContent = text;
+  }
 }
 
 function buildNewPuzzle() {
+  setStatus('', '');
   const catFilter = document.getElementById('category-filter')?.value;
   let pool = allWords;
 
   if (catFilter) {
     pool = allWords.filter(w => w.category === catFilter);
-    if (pool.length < 10) pool = allWords; // Fallback if too few words in category
+    if (pool.length < 8) pool = allWords;
   }
 
-  // Shuffle and sample
+  // Shuffle pool
   const shuffled = [...pool].sort(() => 0.5 - Math.random());
-  const sample = shuffled.slice(0, 35);
 
-  currentPuzzle = generateCrossword(sample, 15);
-  if (!currentPuzzle || currentPuzzle.placedWords.length < 3) {
-    currentPuzzle = generateCrossword(shuffled.slice(0, 40), 15);
+  // Distinct word counts & densities for each mode
+  if (currentMode === 'standard') {
+    // Standard Crossword: 16 words, high intersections
+    currentPuzzle = generateCrossword(shuffled.slice(0, 45), 16);
+    if (!currentPuzzle || currentPuzzle.placedWords.length < 4) {
+      currentPuzzle = generateCrossword(shuffled.slice(0, 55), 16);
+    }
+  } else {
+    // Arrowword: 12 words, compact board to accommodate clue padding
+    currentPuzzle = generateCrossword(shuffled.slice(0, 35), 12);
+    if (!currentPuzzle || currentPuzzle.placedWords.length < 3) {
+      currentPuzzle = generateCrossword(shuffled.slice(0, 45), 12);
+    }
   }
 
   renderPuzzle();
@@ -120,7 +161,6 @@ function prepareArrowwordPuzzle(puzzle) {
   if (!puzzle) return null;
   const { cols, rows, placedWords, matrix } = puzzle;
 
-  // 1. Grid Padding:
   // In Hebrew RTL, Across words flow right-to-left. First letter is at (p.x, p.y).
   // Clue cell must be immediately to the right: (p.x - 1, p.y).
   // Down words flow top-to-bottom. First letter is at (p.x, p.y).
@@ -195,23 +235,25 @@ function createArrowwordClueElement(cellData) {
     // Collision / Double clue
     cellDiv.className = 'arrowword-cell double-clue';
     cellDiv.innerHTML = `
-  <div class="clue-across">
-    ${escapeHtml(cellData.across)}<br><span class="arrow">🡐</span>
-  </div>
-  <div class="clue-down">
-    ${escapeHtml(cellData.down)}<br><span class="arrow">🡓</span>
-  </div>
-`;
+      <div class="clue-across">
+        <span>${escapeHtml(cellData.across)}</span>
+        <span class="arrow">←</span>
+      </div>
+      <div class="clue-down">
+        <span>${escapeHtml(cellData.down)}</span>
+        <span class="arrow">↓</span>
+      </div>
+    `;
   } else {
     // Single clue
     cellDiv.className = 'arrowword-cell';
     const isAcross = Boolean(cellData.across);
     const clueText = isAcross ? cellData.across : cellData.down;
-    const arrow = isAcross ? '🡐' : '🡓';
+    const arrow = isAcross ? '←' : '↓';
     cellDiv.innerHTML = `
-  <span>${escapeHtml(clueText)}</span>
-  <span class="arrow">${arrow}</span>
-`;
+      <span>${escapeHtml(clueText)}</span>
+      <span class="arrow">${arrow}</span>
+    `;
   }
 
   return cellDiv;
@@ -252,9 +294,9 @@ function renderArrowwordPuzzle(gridEl) {
       const cellData = matrix[r][c];
 
       if (!cellData) {
-        // Blocked / empty cell
+        // Blocked / empty cell with subtle hatch pattern
         const cellDiv = document.createElement('div');
-        cellDiv.className = 'grid-cell blocked';
+        cellDiv.className = 'grid-cell arrowword-empty';
         gridEl.appendChild(cellDiv);
       } else if (cellData.type === 'clue') {
         const clueEl = createArrowwordClueElement(cellData);
@@ -308,15 +350,46 @@ function renderStandardPuzzle(gridEl) {
         input.dataset.row = r;
         input.dataset.col = c;
         input.dataset.correct = cellData.char;
+        if (cellData.acrossClue) input.dataset.acrossClue = cellData.acrossClue;
+        if (cellData.downClue) input.dataset.downClue = cellData.downClue;
 
         input.addEventListener('input', (e) => handleCellInput(e, r, c));
         input.addEventListener('keydown', (e) => handleCellKeydown(e, r, c));
+        input.addEventListener('focus', () => handleCellFocus(cellData));
+        input.addEventListener('blur', () => handleCellBlur());
 
         cellDiv.appendChild(input);
       }
       gridEl.appendChild(cellDiv);
     }
   }
+}
+
+function handleCellFocus(cellData) {
+  if (currentMode !== 'standard' || !cellData) return;
+
+  // Clear previous clue highlights
+  document.querySelectorAll('.clues-list li').forEach(el => el.classList.remove('clue-active'));
+
+  if (cellData.acrossClue) {
+    const acrossEl = document.getElementById(`clue-across-${cellData.acrossClue}`);
+    if (acrossEl) {
+      acrossEl.classList.add('clue-active');
+      acrossEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+  if (cellData.downClue) {
+    const downEl = document.getElementById(`clue-down-${cellData.downClue}`);
+    if (downEl) {
+      downEl.classList.add('clue-active');
+      downEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+}
+
+function handleCellBlur() {
+  if (currentMode !== 'standard') return;
+  document.querySelectorAll('.clues-list li').forEach(el => el.classList.remove('clue-active'));
 }
 
 function handleCellInput(e, r, c) {
@@ -350,7 +423,6 @@ function handleCellKeydown(e, r, c) {
 }
 
 function focusNextCell(r, c) {
-  // In RTL, next cell in across word is c + 1, down word is r + 1
   const nextInput = document.querySelector(`input[data-row="${r}"][data-col="${c + 1}"]`) ||
                     document.querySelector(`input[data-row="${r + 1}"][data-col="${c}"]`);
   if (nextInput) nextInput.focus();
@@ -390,13 +462,23 @@ function renderClues() {
 
   for (const item of across) {
     const li = document.createElement('li');
-    li.innerHTML = `<span class="clue-badge">${item.clueNumber}.</span> ${escapeHtml(item.clue)} <small style="color:#6b7280">(${item.word.length})</small>`;
+    li.id = `clue-across-${item.clueNumber}`;
+    li.innerHTML = `<span class="clue-badge">${item.clueNumber}.</span> <span>${escapeHtml(item.clue)}</span> <small style="color:#64748b">(${item.word.length})</small>`;
+    li.addEventListener('click', () => {
+      const cell = document.querySelector(`input[data-row="${item.y}"][data-col="${item.x}"]`);
+      if (cell) cell.focus();
+    });
     acrossList.appendChild(li);
   }
 
   for (const item of down) {
     const li = document.createElement('li');
-    li.innerHTML = `<span class="clue-badge">${item.clueNumber}.</span> ${escapeHtml(item.clue)} <small style="color:#6b7280">(${item.word.length})</small>`;
+    li.id = `clue-down-${item.clueNumber}`;
+    li.innerHTML = `<span class="clue-badge">${item.clueNumber}.</span> <span>${escapeHtml(item.clue)}</span> <small style="color:#64748b">(${item.word.length})</small>`;
+    li.addEventListener('click', () => {
+      const cell = document.querySelector(`input[data-row="${item.y}"][data-col="${item.x}"]`);
+      if (cell) cell.focus();
+    });
     downList.appendChild(li);
   }
 }
@@ -427,7 +509,7 @@ function renderArrowwordSolution(solGrid) {
 
       if (!cellData) {
         const cellDiv = document.createElement('div');
-        cellDiv.className = 'grid-cell blocked';
+        cellDiv.className = 'grid-cell arrowword-empty';
         solGrid.appendChild(cellDiv);
       } else if (cellData.type === 'clue') {
         const clueEl = createArrowwordClueElement(cellData);
@@ -477,6 +559,12 @@ function renderStandardSolution(solGrid) {
 
 function checkAnswers() {
   const inputs = document.querySelectorAll('#puzzle-grid input');
+  if (inputs.length === 0) return;
+
+  let filledCount = 0;
+  let correctCount = 0;
+  let incorrectCount = 0;
+
   inputs.forEach(input => {
     const val = input.value.trim();
     const correct = input.dataset.correct;
@@ -484,25 +572,40 @@ function checkAnswers() {
     parent.classList.remove('cell-correct', 'cell-incorrect');
 
     if (val) {
-      if (typeof normChar === 'function' && normChar(val) === normChar(correct)) {
+      filledCount++;
+      const isMatch = typeof normChar === 'function'
+        ? normChar(val) === normChar(correct)
+        : val === correct;
+
+      if (isMatch) {
         parent.classList.add('cell-correct');
-      } else if (val === correct) {
-        parent.classList.add('cell-correct');
+        correctCount++;
       } else {
         parent.classList.add('cell-incorrect');
+        incorrectCount++;
       }
     }
   });
+
+  if (filledCount === 0) {
+    setStatus('יש למלא אותיות בלוח לפני הבדיקה.', 'info');
+  } else if (incorrectCount === 0 && correctCount === inputs.length) {
+    setStatus('כל הכבוד! פתרת את כל התשבץ בהצלחה! 🎉', 'success');
+  } else if (incorrectCount === 0) {
+    setStatus(`מצוין! כל ${correctCount} האותיות שמילאת נכונות. המשך לפתור!`, 'info');
+  } else {
+    setStatus(`נמצאו ${incorrectCount} אותיות שגויות (מסומנות באדום). נסה שוב!`, 'error');
+  }
 }
 
 function toggleSolution() {
   const solSection = document.getElementById('solution-view');
-  const btn = document.getElementById('btn-toggle-solution');
+  const btnText = document.getElementById('btn-solution-text');
   if (!solSection) return;
 
   const isHidden = solSection.classList.toggle('hidden');
-  if (btn) {
-    btn.textContent = isHidden ? 'הצג פתרון' : 'הסתר פתרון';
+  if (btnText) {
+    btnText.textContent = isHidden ? 'הצג פתרון' : 'הסתר פתרון';
   }
 }
 

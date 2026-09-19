@@ -34,19 +34,20 @@ function generateCrossword(wordList, maxWords = 15) {
 
   // Place first word horizontally at (0, 0)
   const first = candidates[0];
-  for (let i = 0; i < first.word.length; i++) {
-    setCell(i, 0, {
-      char: first.word[i],
-      acrossWord: first,
-      downWord: null
-    });
-  }
-  placed.push({
+  const firstPlaced = {
     ...first,
     x: 0,
     y: 0,
     orientation: 'across'
-  });
+  };
+  for (let i = 0; i < first.word.length; i++) {
+    setCell(i, 0, {
+      char: first.word[i],
+      acrossWord: firstPlaced,
+      downWord: null
+    });
+  }
+  placed.push(firstPlaced);
 
   // Try placing subsequent words
   for (let w = 1; w < candidates.length && placed.length < maxWords; w++) {
@@ -162,6 +163,13 @@ function generateCrossword(wordList, maxWords = 15) {
   }
 
   function applyPlacement(candidate, startX, startY, orientation) {
+    const placedItem = {
+      ...candidate,
+      x: startX,
+      y: startY,
+      orientation
+    };
+
     const wordStr = candidate.word;
     for (let i = 0; i < wordStr.length; i++) {
       const cx = orientation === 'across' ? startX + i : startX;
@@ -169,23 +177,18 @@ function generateCrossword(wordList, maxWords = 15) {
       const existing = getCell(cx, cy);
 
       if (existing) {
-        if (orientation === 'across') existing.acrossWord = candidate;
-        else existing.downWord = candidate;
+        if (orientation === 'across') existing.acrossWord = placedItem;
+        else existing.downWord = placedItem;
       } else {
         setCell(cx, cy, {
           char: wordStr[i],
-          acrossWord: orientation === 'across' ? candidate : null,
-          downWord: orientation === 'down' ? candidate : null
+          acrossWord: orientation === 'across' ? placedItem : null,
+          downWord: orientation === 'down' ? placedItem : null
         });
       }
     }
 
-    placed.push({
-      ...candidate,
-      x: startX,
-      y: startY,
-      orientation
-    });
+    placed.push(placedItem);
   }
 
   // Normalize coordinates so minX = 0, minY = 0
@@ -236,7 +239,9 @@ function generateCrossword(wordList, maxWords = 15) {
     const ny = y - minY;
     matrix[ny][nx] = {
       char: val.char,
-      clueNumber: clueAssignments.get(`${nx},${ny}`) || null
+      clueNumber: clueAssignments.get(`${nx},${ny}`) || null,
+      acrossClue: val.acrossWord ? val.acrossWord.clueNumber : null,
+      downClue: val.downWord ? val.downWord.clueNumber : null
     };
   }
 
