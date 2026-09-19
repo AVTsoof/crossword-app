@@ -1,5 +1,5 @@
 :root {
-  --cell-size: 36px;
+  --cell-size: 80px;
   --grid-border: #222;
   --accent-color: #2563eb;
 }
@@ -14,9 +14,20 @@ body {
 }
 
 .crossword-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  transition: max-width 0.2s ease;
+}
+
+.crossword-container.standard-mode {
+  --cell-size: 36px;
+  max-width: 1000px;
+}
+
+.crossword-container.arrowword-mode {
+  --cell-size: 80px;
+  max-width: 1400px;
 }
 
 /* Controls Header */
@@ -30,6 +41,42 @@ body {
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 24px;
+}
+
+/* Mode Toggle Group */
+.mode-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f3f4f6;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.mode-toggle-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-option input[type="radio"] {
+  cursor: pointer;
+  accent-color: var(--accent-color);
+  margin: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .btn {
@@ -98,6 +145,7 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: inline-block;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .crossword-grid {
@@ -118,6 +166,7 @@ body {
   align-items: center;
   justify-content: center;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .grid-cell.blocked {
@@ -150,6 +199,10 @@ body {
   margin: 0;
 }
 
+.arrowword-mode .grid-cell input {
+  font-size: 28px;
+}
+
 .grid-cell input:focus {
   background-color: #e0f2fe;
 }
@@ -170,6 +223,56 @@ body {
   color: #1f2937;
 }
 
+.arrowword-mode .grid-cell.solved {
+  font-size: 28px;
+}
+
+/* Arrowword Exact Specifications */
+.arrowword-cell {
+  width: 80px;
+  height: 80px;
+  background-color: #f0f0f0;
+  position: relative;
+  border: 1px solid #333;
+  box-sizing: border-box;
+  font-size: 11px;
+  line-height: 1.1;
+  text-align: center;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Diagonal line for cells containing TWO clues */
+.arrowword-cell.double-clue {
+  background: linear-gradient(to bottom left, #f0f0f0 49%, #000 50%, #f0f0f0 51%);
+  display: block;
+}
+
+.arrowword-cell .clue-across {
+  position: absolute;
+  top: 4px; 
+  right: 4px;
+  width: 45%; 
+  text-align: right;
+}
+
+.arrowword-cell .clue-down {
+  position: absolute;
+  bottom: 4px; 
+  left: 4px;
+  width: 45%; 
+  text-align: left;
+}
+
+.arrowword-cell .arrow {
+  font-weight: bold;
+  font-size: 14px;
+  color: #d32f2f;
+}
+
 /* Clues Container */
 .clues-wrapper {
   flex: 1;
@@ -178,6 +281,10 @@ body {
   padding: 20px 24px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.arrowword-mode .clues-wrapper {
+  display: none !important;
 }
 
 .clues-wrapper h3 {
@@ -231,7 +338,7 @@ body {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 10mm;
   }
 
   body {
@@ -244,9 +351,9 @@ body {
   }
 
   .crossword-container {
-    max-width: 100%;
-    padding: 0;
-    margin: 0;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .puzzle-layout {
@@ -285,12 +392,35 @@ body {
     print-color-adjust: exact;
   }
 
+  .arrowword-cell {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid #333 !important;
+  }
+
+  .arrowword-cell.double-clue {
+    background: linear-gradient(to bottom left, #f0f0f0 49%, #000 50%, #f0f0f0 51%) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .arrowword-cell .arrow {
+    color: #d32f2f !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   .grid-cell input {
     display: none;
   }
 
   .clues-wrapper {
     margin-top: 20px;
+  }
+
+  .arrowword-mode .clues-wrapper {
+    display: none !important;
   }
 
   .solution-section {

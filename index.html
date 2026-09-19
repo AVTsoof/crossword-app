@@ -1,12 +1,24 @@
 ---
 layout: default
-title: מחולל תשבצים
+title: מחולל תשבצים ותשחצים
 ---
 <link rel="stylesheet" href="style.css">
 
-<div class="crossword-container" dir="rtl">
+<div class="crossword-container arrowword-mode" dir="rtl">
   <header class="controls-bar no-print">
-    <button id="btn-generate" class="btn">צור תשבץ חדש</button>
+    <div class="mode-toggle-group">
+      <span class="mode-toggle-label">מצב:</span>
+      <label class="toggle-option">
+        <input type="radio" name="puzzle-mode" value="arrowword" checked>
+        <span>תשחץ (Arrowword)</span>
+      </label>
+      <label class="toggle-option">
+        <input type="radio" name="puzzle-mode" value="standard">
+        <span>תשבץ רגיל</span>
+      </label>
+    </div>
+
+    <button id="btn-generate" class="btn">צור תשחץ חדש</button>
     <button id="btn-print" class="btn btn-secondary">הדפס / שמור כ-PDF</button>
     <button id="btn-check" class="btn btn-outline">בדוק תשובות</button>
     <button id="btn-toggle-solution" class="btn btn-outline">הסתר פתרון</button>
@@ -35,7 +47,7 @@ title: מחולל תשבצים
     </div>
 
     <section id="solution-view" class="solution-section">
-      <h2>פתרון התשבץ</h2>
+      <h2 id="solution-title">פתרון התשחץ</h2>
       <div class="grid-wrapper">
         <div id="solution-grid" class="crossword-grid"></div>
       </div>
