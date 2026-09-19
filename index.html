@@ -1,0 +1,47 @@
+---
+layout: default
+title: מחולל תשבצים
+---
+<link rel="stylesheet" href="style.css">
+
+<div class="crossword-container" dir="rtl">
+  <header class="controls-bar no-print">
+    <button id="btn-generate" class="btn">צור תשבץ חדש</button>
+    <button id="btn-print" class="btn btn-secondary">הדפס / שמור כ-PDF</button>
+    <button id="btn-check" class="btn btn-outline">בדוק תשובות</button>
+    <button id="btn-toggle-solution" class="btn btn-outline">הסתר פתרון</button>
+
+    <div class="filter-group">
+      <label for="category-filter">קטגוריה:</label>
+      <select id="category-filter">
+        <option value="">כל הקטגוריות</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <div class="puzzle-layout">
+      <div class="grid-wrapper">
+        <div id="puzzle-grid" class="crossword-grid"></div>
+      </div>
+
+      <div id="clues-container" class="clues-wrapper">
+        <h3>מאוזן</h3>
+        <ul id="clues-across" class="clues-list"></ul>
+
+        <h3>מאונך</h3>
+        <ul id="clues-down" class="clues-list"></ul>
+      </div>
+    </div>
+
+    <section id="solution-view" class="solution-section">
+      <h2>פתרון התשבץ</h2>
+      <div class="grid-wrapper">
+        <div id="solution-grid" class="crossword-grid"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="generator.js"></script>
+<script src="app.js"></script>
