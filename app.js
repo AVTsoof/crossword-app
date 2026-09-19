@@ -2,11 +2,27 @@ let allWords = [];
 let currentPuzzle = null;
 let currentMode = 'arrowword'; // 'arrowword' (default) or 'standard'
 
+function normalizeHebrew(str) {
+  const finalToRegular = {
+    'ך': 'כ',
+    'ם': 'מ',
+    'ן': 'נ',
+    'ף': 'פ',
+    'ץ': 'צ'
+  };
+  return str.replace(/[ךםןףץ]/g, char => finalToRegular[char] || char);
+}
+
 async function init() {
   try {
     const res = await fetch('words.json');
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    allWords = await res.json();
+    const rawWords = await res.json();
+    allWords = rawWords.map(item => ({
+      ...item,
+      word: normalizeHebrew(item.word),
+      answer: normalizeHebrew(item.word)
+    }));
 
     populateCategories();
     setupEventListeners();
@@ -612,32 +628,41 @@ function toggleSolution() {
 // Start app
 document.addEventListener('DOMContentLoaded', init);
 
-function generatePDF() {
-  const element = document.getElementById('pdf-export-container');
-  
-  // Configure the PDF settings
+async function generatePDF() {
+  const container = document.getElementById('pdf-export-container');
+  if (!container) return;
+
+  // 1. Add export styling
+  container.classList.add('pdf-export-active');
+
+  // 2. Configure html2pdf options
   const opt = {
-    margin:       [10, 10, 10, 10], // Top, Left, Bottom, Right margins in mm
-    filename:     'crossword-puzzle.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { 
-      scale: 2, // Higher scale increases resolution
+    margin:       [10, 10, 10, 10], // Margins in mm (top, right, bottom, left)
+    filename:     'tashhet-puzzle.pdf',
+    image:        { type: 'jpeg', quality: 1.0 },
+    html2canvas:  {
+      scale: 2,           // Sharp text rendering
       useCORS: true,
-      scrollY: 0 
+      backgroundColor: '#ffffff',
+      logging: false,
+      scrollX: 0,
+      scrollY: 0
     },
-    jsPDF:        { 
-      unit: 'mm', 
-      format: 'a4', 
-      orientation: 'landscape' // Fits wide grids much better
-    }
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'landscape' // Fits horizontal crosswords cleanly
+    },
+    pagebreak: { mode: ['css', 'legacy'] }
   };
 
-  // Temporarily add a class to adjust layout specifically for the snapshot
-  element.classList.add('pdf-mode');
-
-  // Generate and save the PDF
-  html2pdf().set(opt).from(element).save().then(() => {
-    // Remove the temporary class after download completes
-    element.classList.remove('pdf-mode');
-  });
+  try {
+    // 3. Render and save PDF
+    await html2pdf().set(opt).from(container).save();
+  } catch (err) {
+    console.error('PDF export failed:', err);
+  } finally {
+    // 4. Restore regular screen styling
+    container.classList.remove('pdf-export-active');
+  }
 }

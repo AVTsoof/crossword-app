@@ -344,20 +344,19 @@ body {
 .arrowword-cell {
   width: var(--cell-size);
   height: var(--cell-size);
-  background-color: #f1f5f9;
+  background-color: #f3f3f3;
   position: relative;
-  border: 1px solid #94a3b8;
   box-sizing: border-box;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.1;
   text-align: center;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 4px;
+  padding: 2px;
   color: #1e293b;
   user-select: none;
 }
@@ -372,7 +371,7 @@ body {
 
 /* Arrowword Double Clue Cell (Diagonal Split) */
 .arrowword-cell.double-clue {
-  background: linear-gradient(to bottom left, #f1f5f9 48.5%, #64748b 49.5%, #64748b 50.5%, #f8fafc 51.5%);
+  background: linear-gradient(to bottom left, #f3f3f3 49%, #000 50%, #f3f3f3 51%);
   display: block;
   padding: 0;
 }
@@ -543,23 +542,27 @@ body {
 /* ========================================================= */
 /* GRID CELLS & INTERACTIONS                                 */
 /* ========================================================= */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 80px);
-  grid-template-rows: repeat(var(--rows), 80px);
-  gap: 0px; /* Use 0px gap for Arrowwords to prevent double-thick borders */
-  width: fit-content;
-  direction: rtl;
-}
-
-.crossword-grid {
+.grid, .crossword-grid {
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--cell-size, 80px));
   grid-template-rows: repeat(var(--rows), var(--cell-size, 80px));
-  gap: 0px;
+  background-color: #000; /* Serves as solid grid line background */
+  gap: 1.5px;             /* Produces clean, non-disappearing grid lines */
+  border: 2px solid #000;
   width: fit-content;
   direction: rtl;
   margin: 0 auto;
+}
+
+/* Individual Cell Base */
+.cell, .grid-cell, .arrowword-cell {
+  box-sizing: border-box;
+  background-color: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .grid-cell {
@@ -720,23 +723,42 @@ body {
 }
 
 /* ========================================================= */
-/* PDF EXPORT STYLES (.pdf-mode)                             */
+/* PDF EXPORT STYLES (.pdf-export-active)                     */
 /* ========================================================= */
-.pdf-mode {
-  /* Ensure the container takes up standard A4 proportions */
-  width: 100%;
-  background: white;
-  padding: 10px;
+.pdf-export-active {
+  width: 1000px !important;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
 }
 
-.pdf-mode #solution-view {
+.pdf-export-active #solution-view {
   display: block !important;
 }
 
-.pdf-mode .grid {
-  /* Slightly scale down the grid to guarantee it fits horizontally on the PDF */
-  transform: scale(0.85);
-  transform-origin: top right; /* Align scaling to the right for RTL */
+.pdf-export-active .grid-wrapper {
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.pdf-export-active .grid {
+  --cell-size: 50px; /* Scaled down proportionally for A4 */
+  margin: 0 auto 20px auto;
+}
+
+.pdf-export-active .arrowword-cell {
+  font-size: 7.5px !important;
+}
+
+.pdf-export-active .arrowword-cell .arrow {
+  font-size: 9px !important;
+}
+
+.pdf-export-active .grid-cell input,
+.pdf-export-active .grid-cell.solved {
+  font-size: 18px !important;
 }
 
 /* Ensure the page break div operates correctly */
