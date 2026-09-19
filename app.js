@@ -285,8 +285,8 @@ function renderArrowwordPuzzle(gridEl) {
   if (!arrowData) return;
 
   const { cols, rows, matrix } = arrowData;
-  gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-  gridEl.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
+  gridEl.style.setProperty('--cols', cols);
+  gridEl.style.setProperty('--rows', rows);
   gridEl.innerHTML = '';
 
   for (let r = 0; r < rows; r++) {
@@ -324,8 +324,8 @@ function renderArrowwordPuzzle(gridEl) {
 
 function renderStandardPuzzle(gridEl) {
   const { cols, rows, matrix } = currentPuzzle;
-  gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-  gridEl.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
+  gridEl.style.setProperty('--cols', cols);
+  gridEl.style.setProperty('--rows', rows);
   gridEl.innerHTML = '';
 
   for (let r = 0; r < rows; r++) {
@@ -499,8 +499,8 @@ function renderArrowwordSolution(solGrid) {
   if (!arrowData) return;
 
   const { cols, rows, matrix } = arrowData;
-  solGrid.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-  solGrid.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
+  solGrid.style.setProperty('--cols', cols);
+  solGrid.style.setProperty('--rows', rows);
   solGrid.innerHTML = '';
 
   for (let r = 0; r < rows; r++) {
@@ -528,8 +528,8 @@ function renderArrowwordSolution(solGrid) {
 
 function renderStandardSolution(solGrid) {
   const { cols, rows, matrix } = currentPuzzle;
-  solGrid.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-  solGrid.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
+  solGrid.style.setProperty('--cols', cols);
+  solGrid.style.setProperty('--rows', rows);
   solGrid.innerHTML = '';
 
   for (let r = 0; r < rows; r++) {

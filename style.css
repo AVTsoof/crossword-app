@@ -543,9 +543,20 @@ body {
 /* ========================================================= */
 /* GRID CELLS & INTERACTIONS                                 */
 /* ========================================================= */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 80px);
+  grid-template-rows: repeat(var(--rows), 80px);
+  gap: 0px; /* Use 0px gap for Arrowwords to prevent double-thick borders */
+  width: fit-content;
+  direction: rtl;
+}
+
 .crossword-grid {
   display: grid;
-  gap: 1px;
+  grid-template-columns: repeat(var(--cols), var(--cell-size, 80px));
+  grid-template-rows: repeat(var(--rows), var(--cell-size, 80px));
+  gap: 0px;
   width: fit-content;
   direction: rtl;
   margin: 0 auto;
@@ -712,18 +723,20 @@ body {
 /* PRINT STYLES                                              */
 /* ========================================================= */
 @media print {
+  /* Force landscape orientation and strict physical margins */
   @page {
-    size: A4 portrait;
-    margin: 8mm;
+    size: A4 landscape;
+    margin: 10mm;
   }
 
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  .no-print {
-    display: none !important;
+  /* Unset centering and overflow restrictions that cause clipping */
+  body, main, section {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    width: 100% !important;
+    background: transparent !important;
   }
 
   .crossword-container {
@@ -752,13 +765,34 @@ body {
     margin-bottom: 20px;
   }
 
-  .crossword-grid {
-    border: 2px solid #000000 !important;
-    gap: 1px !important;
-    background-color: #000000 !important;
+  /* Prevent the grid from splitting across pages */
+  .grid,
+  .crossword-grid,
+  #puzzle-grid,
+  #solution-grid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-right: 0 !important; /* Force alignment to the right edge in RTL */
+    
+    /* Shrink the CSS Grid tracks for A4 fitting */
+    grid-template-columns: repeat(var(--cols), 48px) !important;
+    grid-template-rows: repeat(var(--rows), 48px) !important;
+    gap: 0px !important;
   }
 
+  /* Scale fallback for massive boards */
+  .grid,
+  .crossword-grid {
+    zoom: 0.7; /* Scales down the entire rendered element */
+  }
+
+  /* Shrink the individual cells and content */
+  .arrowword-cell,
   .grid-cell {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 7px !important;
+    border-width: 1px !important;
     background-color: #ffffff !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -790,7 +824,21 @@ body {
     print-color-adjust: exact;
   }
 
+  /* Adjust internal clue positioning for the smaller print cells */
+  .arrowword-cell .clue-across {
+    top: 2px !important;
+    right: 2px !important;
+    width: 50% !important;
+  }
+
+  .arrowword-cell .clue-down {
+    bottom: 2px !important;
+    left: 2px !important;
+    width: 50% !important;
+  }
+
   .arrowword-cell .arrow {
+    font-size: 8px !important;
     color: #dc2626 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -798,6 +846,11 @@ body {
 
   .grid-cell input {
     display: none !important;
+  }
+
+  .grid-cell.solved span {
+    font-size: 14px !important;
+    font-weight: bold !important;
   }
 
   .clues-wrapper {
@@ -809,6 +862,13 @@ body {
     display: none !important;
   }
 
+  /* Hide UI elements (buttons, toggles) */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure the solution page ALWAYS starts on a fresh sheet */
+  .solution-page,
   .solution-section {
     page-break-before: always;
     break-before: page;
