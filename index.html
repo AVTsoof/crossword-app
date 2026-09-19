@@ -47,9 +47,9 @@
           <span class="btn-icon">👁</span>
           <span id="btn-solution-text">הצג פתרון</span>
         </button>
-        <button id="btn-print" class="btn btn-secondary">
+        <button id="btn-print" class="btn btn-secondary" onclick="generatePDF()">
           <span class="btn-icon">🖨</span>
-          <span>הדפס / שמור כ-PDF</span>
+          <span>הורד תשבץ כ-PDF</span>
         </button>
       </div>
 
@@ -63,8 +63,8 @@
 
     <div id="status-message" class="status-banner hidden"></div>
 
-    <main class="main-content">
-      <div class="puzzle-layout">
+    <main class="main-content" id="pdf-export-container">
+      <section id="puzzle-view" class="puzzle-layout">
         <div class="grid-wrapper">
           <div id="puzzle-grid" class="crossword-grid grid"></div>
         </div>
@@ -79,7 +79,10 @@
             <ul id="clues-down" class="clues-list"></ul>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- The html2pdf-pagebreak class tells the library to split pages here -->
+      <div class="html2pdf__page-break"></div>
 
       <section id="solution-view" class="solution-section solution-page hidden">
         <div class="solution-header">
@@ -93,6 +96,7 @@
     </main>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="generator.js"></script>
   <script src="app.js"></script>
 </body>

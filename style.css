@@ -720,158 +720,29 @@ body {
 }
 
 /* ========================================================= */
-/* PRINT STYLES                                              */
+/* PDF EXPORT STYLES (.pdf-mode)                             */
 /* ========================================================= */
-@media print {
-  /* Force landscape orientation and strict physical margins */
-  @page {
-    size: A4 landscape;
-    margin: 10mm;
-  }
+.pdf-mode {
+  /* Ensure the container takes up standard A4 proportions */
+  width: 100%;
+  background: white;
+  padding: 10px;
+}
 
-  /* Unset centering and overflow restrictions that cause clipping */
-  body, main, section {
-    margin: 0 !important;
-    padding: 0 !important;
-    display: block !important;
-    overflow: visible !important;
-    width: 100% !important;
-    background: transparent !important;
-  }
+.pdf-mode #solution-view {
+  display: block !important;
+}
 
-  .crossword-container {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
+.pdf-mode .grid {
+  /* Slightly scale down the grid to guarantee it fits horizontally on the PDF */
+  transform: scale(0.85);
+  transform-origin: top right; /* Align scaling to the right for RTL */
+}
 
-  .puzzle-layout {
-    display: block !important;
-    page-break-after: always;
-    break-after: page;
-  }
-
-  .grid-wrapper,
-  .clues-wrapper,
-  .solution-section {
-    box-shadow: none !important;
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-  }
-
-  .grid-wrapper {
-    margin-bottom: 20px;
-  }
-
-  /* Prevent the grid from splitting across pages */
-  .grid,
-  .crossword-grid,
-  #puzzle-grid,
-  #solution-grid {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    margin-right: 0 !important; /* Force alignment to the right edge in RTL */
-    
-    /* Shrink the CSS Grid tracks for A4 fitting */
-    grid-template-columns: repeat(var(--cols), 48px) !important;
-    grid-template-rows: repeat(var(--rows), 48px) !important;
-    gap: 0px !important;
-  }
-
-  /* Scale fallback for massive boards */
-  .grid,
-  .crossword-grid {
-    zoom: 0.7; /* Scales down the entire rendered element */
-  }
-
-  /* Shrink the individual cells and content */
-  .arrowword-cell,
-  .grid-cell {
-    width: 48px !important;
-    height: 48px !important;
-    font-size: 7px !important;
-    border-width: 1px !important;
-    background-color: #ffffff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .standard-mode .grid-cell.blocked {
-    background-color: #000000 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .arrowword-mode .grid-cell.blocked,
-  .arrowword-mode .grid-cell.arrowword-empty {
-    background: #f1f5f9 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .arrowword-cell {
-    background-color: #f1f5f9 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    border: 1px solid #333333 !important;
-  }
-
-  .arrowword-cell.double-clue {
-    background: linear-gradient(to bottom left, #f1f5f9 48.5%, #000 49.5%, #000 50.5%, #f1f5f9 51.5%) !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Adjust internal clue positioning for the smaller print cells */
-  .arrowword-cell .clue-across {
-    top: 2px !important;
-    right: 2px !important;
-    width: 50% !important;
-  }
-
-  .arrowword-cell .clue-down {
-    bottom: 2px !important;
-    left: 2px !important;
-    width: 50% !important;
-  }
-
-  .arrowword-cell .arrow {
-    font-size: 8px !important;
-    color: #dc2626 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .grid-cell input {
-    display: none !important;
-  }
-
-  .grid-cell.solved span {
-    font-size: 14px !important;
-    font-weight: bold !important;
-  }
-
-  .clues-wrapper {
-    display: flex !important;
-    margin-top: 16px;
-  }
-
-  .arrowword-mode .clues-wrapper {
-    display: none !important;
-  }
-
-  /* Hide UI elements (buttons, toggles) */
-  .no-print {
-    display: none !important;
-  }
-
-  /* Ensure the solution page ALWAYS starts on a fresh sheet */
-  .solution-page,
-  .solution-section {
-    page-break-before: always;
-    break-before: page;
-    margin-top: 0;
-  }
+/* Ensure the page break div operates correctly */
+.html2pdf__page-break {
+  display: block;
+  height: 0;
+  clear: both;
+  page-break-before: always;
 }

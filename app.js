@@ -38,7 +38,7 @@ function populateCategories() {
 
 function setupEventListeners() {
   document.getElementById('btn-generate')?.addEventListener('click', () => buildNewPuzzle());
-  document.getElementById('btn-print')?.addEventListener('click', () => window.print());
+  document.getElementById('btn-print')?.addEventListener('click', () => generatePDF());
   document.getElementById('btn-check')?.addEventListener('click', () => checkAnswers());
   document.getElementById('btn-toggle-solution')?.addEventListener('click', () => toggleSolution());
   document.getElementById('category-filter')?.addEventListener('change', () => buildNewPuzzle());
@@ -611,3 +611,33 @@ function toggleSolution() {
 
 // Start app
 document.addEventListener('DOMContentLoaded', init);
+
+function generatePDF() {
+  const element = document.getElementById('pdf-export-container');
+  
+  // Configure the PDF settings
+  const opt = {
+    margin:       [10, 10, 10, 10], // Top, Left, Bottom, Right margins in mm
+    filename:     'crossword-puzzle.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { 
+      scale: 2, // Higher scale increases resolution
+      useCORS: true,
+      scrollY: 0 
+    },
+    jsPDF:        { 
+      unit: 'mm', 
+      format: 'a4', 
+      orientation: 'landscape' // Fits wide grids much better
+    }
+  };
+
+  // Temporarily add a class to adjust layout specifically for the snapshot
+  element.classList.add('pdf-mode');
+
+  // Generate and save the PDF
+  html2pdf().set(opt).from(element).save().then(() => {
+    // Remove the temporary class after download completes
+    element.classList.remove('pdf-mode');
+  });
+}
